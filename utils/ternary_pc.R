@@ -1,3 +1,20 @@
+clr <- function(X){
+  if(is.array(X)){
+    t(apply(X, 1, function(x) log(x) - mean(log(x))))
+  }else{
+    log(X) - mean(log(X))
+  }
+}
+
+clrInv <- function(X){
+  if(is.array(X)){
+    t(apply(X, 1, function(x) exp(x-max(x))/sum(exp(x-max(x)))))
+  }else{
+    exp(X-max(X))/sum(exp(X-max(X)))
+  }
+}
+
+
 ## orthogonal projection onto the hyperplane spanned by the simplex for displaying power transform PCA
 proj_simplex <- function(X){
   if(!inherits(X, 'matrix')){

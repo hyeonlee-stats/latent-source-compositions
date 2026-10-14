@@ -5,7 +5,7 @@
 #' @param sort_vertices logical; if True, all variables are presented in order
 #' @param max.k maximum number of elements to display
 #' @return a ggplot object
-plot_bar_single <- function(v, sort_vertices = T, max.k = 12, xlim = NULL, grayscale = NULL){
+plot_bar <- function(v, sort_vertices = T, max.k = 12, xlim = NULL, grayscale = NULL){
 
   if(is.null(grayscale)){
     grayscale = (min(v) >= -1e-8)
@@ -43,22 +43,46 @@ plot_bar_single <- function(v, sort_vertices = T, max.k = 12, xlim = NULL, grays
   return(g)
 }
 
-#' @title Plot vertices or loading vectors
-#' @description Creating a bar plot summarizing vertices or loadings of PSA
+#' @title Plot Vertices
+#' @description Creating a bar plot summarizing vertices of PSA
 #' @import ggplot2
-#' @param V a vector or a matrix of vertices or loadings
+#' @param V matrix of vertices
 #' @param sort_vertices logical; if True, all variables are presented in order
-#' @param max.k maximum number of compoonents to display
+#' @param max.k maximum number of elements to display
 #' @param title title of plot
 #' @return a ggplot object
-plot_bars <- function(V, sort_vertices = T, max.k = 12, xlim = NULL, title = NULL){
+plot_vertex <- function(V, sort_vertices = T, max.k = 12, xlim = NULL, title = NULL){
 
   if(is.null(rownames(V))){
     rownames(V) = paste0('e',1:nrow(V))
   }
   ls = list()
   for(i in 1:ncol(V)){
-    ls[[i]] = plot_bar_single(V[,i], sort_vertices = sort_vertices, max.k = max.k, xlim = xlim) + ggtitle(colnames(V)[i])
+    ls[[i]] = plot_bar(V[,i], sort_vertices = sort_vertices,
+                       max.k = max.k, xlim = xlim, grayscale = T) + ggtitle(colnames(V)[i])
+  }
+  g = cowplot::plot_grid(plotlist = ls, nrow = 1, align = 'v', axis = 'l')
+  if(!is.null(title)){
+    g = plot_grid(ggdraw() + draw_label(title), g,
+                  ncol = 1, rel_heights = c(1,10))
+  }
+  return(g)
+}
+
+#' @title Plot Loading Vectors
+#' @description Creating a bar plot summarizing loading vectors of PSA
+#' @import ggplot2
+#' @inheritParams plot_vertex
+#' @return a ggplot object
+plot_loadings <- function(V, sort_vertices = T, max.k = 12, xlim = NULL, title = NULL){
+
+  if(is.null(rownames(V))){
+    rownames(V) = paste0('e',1:nrow(V))
+  }
+  ls = list()
+  for(i in 1:ncol(V)){
+    ls[[i]] = plot_bar(V[,i], sort_vertices = sort_vertices,
+                       max.k = max.k, xlim = xlim, grayscale = F) + ggtitle(colnames(V)[i])
   }
   g = cowplot::plot_grid(plotlist = ls, nrow = 1, align = 'v', axis = 'l')
   if(!is.null(title)){

@@ -21,14 +21,12 @@ ex1.df = as.data.frame(X1) %>%
 
 ### ==== PSA application ====
 
-ex1.psag = psa(X1, 'g')
+ex1.psap = psa(X1, 'p')
 ex1.psas = psa(X1, 's')
-ex1.psao = psa(X1, 'o')
 ex1.pca = comp_pca(X1)
 ex1.apca = comp_apca(X1)
 
 ex1.psas = flip_loading(ex1.psas, 1:2)
-ex1.psao = flip_loading(ex1.psao, 1)
 ex1.pca = flip_loading(ex1.pca, 2)
 ex1.apca = flip_loading(ex1.apca, 2)
 
@@ -36,13 +34,12 @@ ex1.apca = flip_loading(ex1.apca, 2)
 
 g.data = ternary_pc(X1, ex1.df$label, type = 'data') + ggtitle('Data')
 
-g.psag = ternary_pc(X1, ex1.df$label, type = 'psa', X.res = ex1.psag) + ggtitle('PSA-P')
+g.psap = ternary_pc(X1, ex1.df$label, type = 'psa', X.res = ex1.psap) + ggtitle('PSA-P')
 g.psas = ternary_pc(X1, ex1.df$label, type = 'psa', X.res = ex1.psas) + ggtitle('PSA-S')
-g.psao = ternary_pc(X1, ex1.df$label, type = 'psa', X.res = ex1.psao) + ggtitle('PSA-O')
 g.pca = ternary_pc(X1, ex1.df$label, type = 'pca', X.res = ex1.pca) + ggtitle('PCA')
 g.apca = ternary_pc(X1, ex1.df$label, type = 'logratio', X.res = ex1.apca) + ggtitle('Log-ratio')
-plot_grid(g.data, g.psag, g.psas, NULL, g.pca, g.apca, nrow = 2)
-ggsave('ex1_ternary_pc.jpeg', path = image.path, width = 12, height = 8)
+plot_grid(g.data, g.psap, g.psas, NULL, g.pca, g.apca, nrow = 2)
+ggsave('ex1_ternary_pc.pdf', path = image.path, width = 12, height = 8)
 
 ### ==== scores ====
 
@@ -61,11 +58,10 @@ ex_plot_scores <- function(scores, label){
   return(g)
 }
 
-g.psag = ex_plot_scores(ex1.psag$scores, ex1.df$label) + ggtitle('PSA-G')
+g.psap = ex_plot_scores(ex1.psap$scores, ex1.df$label) + ggtitle('PSA-P')
 g.psas = ex_plot_scores(ex1.psas$scores, ex1.df$label) + ggtitle('PSA-S')
-g.psao = ex_plot_scores(ex1.psao$scores, ex1.df$label) + ggtitle('PSA-O')
 g.pca = ex_plot_scores(ex1.pca$scores, ex1.df$label) + ggtitle('PCA')
 g.apca = ex_plot_scores(ex1.apca$scores, ex1.df$label) + ggtitle('Log-ratio')
 
-g = plot_grid(g.data, g.pca, g.apca, g.psag, g.psas, g.psao, nrow = 2)
-ggsave('ex1_scores.jpeg', g, path = image.path, width = 9, height = 6)
+g = plot_grid(g.data, g.psap, g.psas, NULL, g.pca, g.apca, nrow = 2)
+ggsave('ex1_scores.pdf', g, path = image.path, width = 9, height = 6)

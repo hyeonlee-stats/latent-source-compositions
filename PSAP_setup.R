@@ -3,26 +3,28 @@ if (!requireNamespace("renv", quietly = TRUE)) install.packages("renv")
 renv::restore()
 
 # 2. load packages
-required_packages <- c(
-  "plyr", "dplyr", "reshape",
-  "ggplot2", "GGally", "viridis", "ggnewscale", "cowplot", "latex2exp",
-  "scales", "compositions"
-)
+library(plyr)
+library(dplyr)
+library(tidyr)
+library(reshape)
+library(ggplot2)
+library(ggtern)
+# library(GGally)
+library(reshape2)
+library(cowplot)
+library(viridis)
+# library(ggnewscale)
+library(scales)
+library(latex2exp)
+# library(compositions)
 
-for (pkg in required_packages) {
-  if (!require(pkg, character.only = TRUE)) {
-    install.packages(pkg)
-    library(pkg, character.only = TRUE)
-  }
-}
 set_theme(theme_bw() + theme(plot.title = element_text(hjust = 0.5)))
 
 # 3. load principal subsimplex analysis
-if (!requireNamespace("psacomp", quietly = TRUE)) {
-  if (!requireNamespace("devtools", quietly = TRUE)) install.packages("devtools")
-  devtools::install_github('hyeonlee-stats/psacomp')
+if (!requireNamespace("psacomp-dev", quietly = TRUE)) {
+  renv::install('hyeonlee-stats/psacomp-dev')
 }
-library(psacomp)
+library('psacomp')
 
 # 4. source utility functions
 utils_files <- list.files('utils', pattern = '\\.R$', full.names = TRUE)

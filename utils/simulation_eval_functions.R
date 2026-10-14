@@ -1,12 +1,3 @@
-devtools::load_all('../psacomp-dev')
-source('../PSAG-analysis/utils/wrapper_pca.R')
-source('../PSAG-analysis/utils/ggplot_utils.R')
-library(ggplot2)
-library(cowplot)
-library(reshape2)
-library(dplyr)
-
-
 get_rss <- function(X, X.fit){
   rss = sapply(X.fit$Xhat, function(mat) mean(rowSums((X-mat)^2)))
   names(rss) = names(X.fit$Xhat)
@@ -54,17 +45,17 @@ test_case <- function(d, k, n, pmean = NULL, threshold = 1e-6, r = min(20,d), se
 
   time.pca = system.time(rss.pca <- get_rss(X, comp_pca(X))[1:r])['elapsed']
   time.psas = system.time(rss.psas <- get_rss(X, psa(X, 's'))[1:r])['elapsed']
-  time.psag = system.time(rss.psag <- get_rss(X, psa(X, 'g'))[1:r])['elapsed']
+  time.psap = system.time(rss.psap <- get_rss(X, psa(X, 'p'))[1:r])['elapsed']
   if(fast){
-    time.fast_psag = system.time(rss.fast_psag <- get_rss(X, fast_psag(X, n_components = min(20,d)))[1:r])['elapsed']
+    time.fast_psap = system.time(rss.fast_psap <- get_rss(X, fast_psap(X, n_components = min(20,d)))[1:r])['elapsed']
   }else{
-    time.fast_psag = system.time(rss.fast_psag <- 0)['elapsed']
+    time.fast_psap = system.time(rss.fast_psap <- 0)['elapsed']
   }
 
-  time.mat <- c(pca = time.pca, psas = time.psas, psag = time.psag, fast_psag = time.fast_psag)
+  time.mat <- c(pca = time.pca, psas = time.psas, psap = time.psap, fast_psap = time.fast_psap)
 
   return(list(time.mat = time.mat,
-              rss = rbind(rss.pca, rss.psas, rss.psag, rss.fast_psag)))
+              rss = rbind(rss.pca, rss.psas, rss.psap, rss.fast_psap)))
 }
 
 test_set <- function(d, k, n, pmean = NULL, threshold = 1e-6, r = min(20,d), seeds = NULL, fast = T){
@@ -94,15 +85,15 @@ plot_sim <- function(res, r = 8, fast = T, ve = T){
     res = list(time.mat = t(sapply(res, function(ls) ls$time.mat)),
                rss.pca = t(sapply(res, function(ls) 1-ls$rss[1,]/ls$rss[1,1])),
                rss.psas = t(sapply(res, function(ls) 1-ls$rss[2,]/ls$rss[1,1])),
-               rss.psag = t(sapply(res, function(ls) 1-ls$rss[3,]/ls$rss[1,1])),
-               rss.fast_psag = t(sapply(res, function(ls) 1-ls$rss[4,]/ls$rss[1,1])))
+               rss.psap = t(sapply(res, function(ls) 1-ls$rss[3,]/ls$rss[1,1])),
+               rss.fast_psap = t(sapply(res, function(ls) 1-ls$rss[4,]/ls$rss[1,1])))
   }else{
     y.lab = 'RSS'
     res = list(time.mat = t(sapply(res, function(ls) ls$time.mat)),
                rss.pca = t(sapply(res, function(ls) ls$rss[1,])),
                rss.psas = t(sapply(res, function(ls) ls$rss[2,])),
-               rss.psag = t(sapply(res, function(ls) ls$rss[3,])),
-               rss.fast_psag = t(sapply(res, function(ls) ls$rss[4,])))
+               rss.psap = t(sapply(res, function(ls) ls$rss[3,])),
+               rss.fast_psap = t(sapply(res, function(ls) ls$rss[4,])))
   }
 
   if(fast){
@@ -110,9 +101,9 @@ plot_sim <- function(res, r = 8, fast = T, ve = T){
                  mutate(method = 'PCA'),
                as.data.frame(res$rss.psas) %>%
                  mutate(method = 'PSA-S'),
-               as.data.frame(res$rss.psag) %>%
+               as.data.frame(res$rss.psap) %>%
                  mutate(method = 'PSA-P'),
-               as.data.frame(res$rss.fast_psag) %>%
+               as.data.frame(res$rss.fast_psap) %>%
                  mutate(method = 'fast PSA-P')) %>%
       select(c(paste0('r=',1:r),'method')) %>%
       melt(id.vars = 'method') %>%
@@ -137,7 +128,7 @@ plot_sim <- function(res, r = 8, fast = T, ve = T){
                  mutate(method = 'PCA'),
                as.data.frame(res$rss.psas) %>%
                  mutate(method = 'PSA-S'),
-               as.data.frame(res$rss.psag) %>%
+               as.data.frame(res$rss.psap) %>%
                  mutate(method = 'PSA-P')) %>%
       select(c(paste0('r=',1:r),'method')) %>%
       melt(id.vars = 'method') %>%
@@ -173,25 +164,25 @@ plot_sim <- function(res, r = 8, fast = T, ve = T){
     res = list(time.mat = t(sapply(res, function(ls) ls$time.mat)),
                rss.pca = t(sapply(res, function(ls) 1-ls$rss[1,]/ls$rss[1,1])),
                rss.psas = t(sapply(res, function(ls) 1-ls$rss[2,]/ls$rss[1,1])),
-               rss.psag = t(sapply(res, function(ls) 1-ls$rss[3,]/ls$rss[1,1])),
-               rss.fast_psag = t(sapply(res, function(ls) 1-ls$rss[4,]/ls$rss[1,1])))
+               rss.psap = t(sapply(res, function(ls) 1-ls$rss[3,]/ls$rss[1,1])),
+               rss.fast_psap = t(sapply(res, function(ls) 1-ls$rss[4,]/ls$rss[1,1])))
   }else{
     y.lab = 'RSS'
     y.lim = c(0, base::max(sapply(res, function(ls) ls$rss[,-1])))
     res = list(time.mat = t(sapply(res, function(ls) ls$time.mat)),
                rss.pca = t(sapply(res, function(ls) ls$rss[1,])),
                rss.psas = t(sapply(res, function(ls) ls$rss[2,])),
-               rss.psag = t(sapply(res, function(ls) ls$rss[3,])),
-               rss.fast_psag = t(sapply(res, function(ls) ls$rss[4,])))
+               rss.psap = t(sapply(res, function(ls) ls$rss[3,])),
+               rss.fast_psap = t(sapply(res, function(ls) ls$rss[4,])))
   }
 
   df.rss = rbind(as.data.frame(res$rss.pca) %>%
                    mutate(method = 'PCA'),
                  as.data.frame(res$rss.psas) %>%
                    mutate(method = 'PSA-S'),
-                 as.data.frame(res$rss.psag) %>%
+                 as.data.frame(res$rss.psap) %>%
                    mutate(method = 'PSA-P'),
-                 as.data.frame(res$rss.fast_psag) %>%
+                 as.data.frame(res$rss.fast_psap) %>%
                    mutate(method = 'fast PSA-P')) %>%
     select(c(paste0('r=',1:r),'method')) %>%
     melt(id.vars = 'method') %>%

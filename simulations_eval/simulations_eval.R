@@ -1,5 +1,5 @@
 
-## Run
+# ==== Run ====
 res_10_2 = test_set(d = 10, k = 2, n = 100, threshold = 1e-6, r = 10, seeds = 0 + 1:100, fast = F)
 saveRDS(res_10_2, 'simulations_eval/results/res_10_2.rds')
 res_10_5 = test_set(d = 10, k = 5, n = 100, threshold = 1e-6, r = 10, seeds = 100 + 1:100, fast = F)
@@ -22,6 +22,7 @@ res_40_5_sparse = test_set(d = 40, k = 5, n = 100, pmean = pmean,
 saveRDS(res_40_5_sparse, 'simulations_eval/results/res_40_5_sparse.rds')
 
 
+# ==== plot ====
 g.10.2 = plot_sim(readRDS('simulations_eval/results/res_10_2.rds'), fast = F)
 g.10.5 = plot_sim(readRDS('simulations_eval/results/res_10_5.rds'), fast = F)
 g.20.2 = plot_sim(readRDS('simulations_eval/results/res_20_2.rds'), fast = F)
@@ -54,7 +55,7 @@ plot_grid(NULL,
           g,
           NULL, get_legend(g.legend),
           nrow = 3, rel_widths = c(1, 10), rel_heights = c(1, 20, 1))
-ggsave('simulations_eval/figures/simulation_ve.jpeg', width = 12, height = 9)
+ggsave('simulations_eval/figures/simulation_ve.pdf', width = 12, height = 9)
 
 
 

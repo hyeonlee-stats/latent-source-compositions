@@ -21,9 +21,13 @@ to_2d_V <- function(X, V = diag(3)){
 #' @description Draw an empty ternary diagram with vertex matrix V. See @seealso [to_2d_V()]
 #' @param V matrix of vertices
 #' @return a ggplot object with aes(x = e1, y = e2)
-plot_subsimplex <- function(V = diag(3)){
-  if(is.null(colnames(V))){
-    colnames(V) = c('V1','V2','V3')
+plot_subsimplex <- function(V = diag(3), vnames = NULL){
+  if(is.null(vnames)){
+    if(!is.null(colnames(V))){
+      vnames = colnames(V)
+    }else{
+      vnames = c('V1','V2','V3')
+    }
   }
   V2d = as.matrix(to_2d_V(t(V), V))
   pad = max(V2d) - min(V2d)
@@ -39,29 +43,69 @@ plot_subsimplex <- function(V = diag(3)){
                 t %*% cbind(V2d[c(1,3),], V2d[c(2,3),])) %>%
     as.data.frame() %>%
     setNames(c('x','y','xend','yend'))
-  ggplot(df, aes(x = e1, y = e2)) +
+  g = ggplot(df, aes(x = e1, y = e2)) +
     theme_void() +
-    theme(aspect.ratio = 1) +
-    scale_x_continuous(limits = c(min(V2d)-0.05*pad, max(V2d)+0.05*pad)) +
-    scale_y_continuous(limits = c(min(V2d)-0.05*pad, max(V2d)+0.05*pad)) +
+    theme(aspect.ratio = (max(V2d)-min(V2d)+0.1*pad)/(max(V2d)-min(V2d)+0.2*pad)) +
+    scale_x_continuous(limits = c(min(V2d)-0.1*pad, max(V2d)+0.1*pad)) +
+    scale_y_continuous(limits = c(min(V2d)-0.1*pad, max(V2d))) +
     geom_segment(data = df, aes(x = x, y = y, xend = xend, yend = yend)) +
     geom_text(data = as.data.frame(V2d) %>%
-                mutate(e1 = e1 + c(-0.05, 0.05, 0),
-                       e2 = e2 + c(0, 0, 0.05),
-                       label = colnames(V)),
+                mutate(e1 = e1 + c(-0.1, 0.1, 0),
+                       e2 = e2 + c(-0.05, -0.05, 0.1),
+                       label = vnames),
               aes(x = e1, y = e2, label = label)) +
     geom_segment(data = Vgrid, aes(x = x, y = y, xend = xend, yend = yend),
                  col = 'gray', alpha = 0.4) +
-    geom_text(data = as.data.frame(t[c(2,4,6,8),] %*% V2d[c(2,1),]) %>%
-                mutate(e2 = e2 - 0.05*pad,
-                       label = c(20,40,60,80)),
-              aes(x=e1, y=e2, label = label), size = 3) +
-    geom_text(data = as.data.frame(t[c(2,4,6,8),] %*% V2d[c(3,2),]) %>%
+    geom_text(data = as.data.frame(cbind(c(0.2,0.4,0.6,0.8,1.0) - 0.03,
+                                         c(0.8,0.6,0.4,0.2,0.0) + 0.03) %*% V2d[c(2,1),]) %>%
+                mutate(e2 = e2 - 0.04*pad,
+                       label = c(20,40,60,80,100)),
+              aes(x=e1, y=e2, label = label), size = 3, angle = 60) +
+    geom_text(data = as.data.frame(cbind(c(0.2,0.4,0.6,0.8,1.0) + 0.005,
+                                         c(0.8,0.6,0.4,0.2,0.0) - 0.005) %*% V2d[c(3,2),]) %>%
                 mutate(e1 = e1 + 0.05*pad,
-                       label = c(20,40,60,80)),
+                       label = c(20,40,60,80,100)),
               aes(x=e1, y=e2, label = label), size = 3) +
-    geom_text(data = as.data.frame(t[c(2,4,6,8),] %*% V2d[c(1,3),]) %>%
+    geom_text(data = as.data.frame(cbind(c(0.2,0.4,0.6,0.8,1.0) - 0.05,
+                                         c(0.8,0.6,0.4,0.2,0.0) + 0.05) %*% V2d[c(1,3),]) %>%
                 mutate(e1 = e1 - 0.05*pad,
-                       label = c(20,40,60,80)),
-              aes(x=e1, y=e2, label = label), size = 3)
+                       label = c(20,40,60,80,100)),
+              aes(x=e1, y=e2, label = label), size = 3, angle = -60)
+
+  make_ticks <- function(from, to, tick_length = 0.015 * pad) {
+    p <- seq(0.2, 1, by = 0.2)
+
+    A <- V2d[from, ]
+    B <- V2d[to, ]
+    C <- V2d[setdiff(seq_len(3), c(from, to)), ]
+
+    pos <- (1 - p) %o% A + p %o% B
+
+    direction <- A - C
+    direction <- direction / sqrt(sum(direction^2))
+
+    ends <- sweep(pos, 2, tick_length * direction, "+")
+
+    data.frame(
+      x = pos[, 1],
+      y = pos[, 2],
+      xend = ends[, 1],
+      yend = ends[, 2]
+    )
+  }
+
+  ticks <- rbind(
+    make_ticks(1, 2),  # Bottom edge: proportion of V2.
+    make_ticks(2, 3),  # Right edge: proportion of V3.
+    make_ticks(3, 1)   # Left edge: proportion of V1.
+  )
+
+  g + geom_segment(
+    data = ticks,
+    aes(x = x, y = y, xend = xend, yend = yend),
+    inherit.aes = FALSE,
+    linewidth = 0.4
+  )
+
 }
+
