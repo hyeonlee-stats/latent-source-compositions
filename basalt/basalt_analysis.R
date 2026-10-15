@@ -1,5 +1,3 @@
-source('PSAP_setup.R')
-
 blt.X = readRDS('basalt/blt.X.RDS')
 blt.type = readRDS('basalt/blt.type.RDS')
 
@@ -52,7 +50,7 @@ blt.biplots = plot_grid(plot_grid(psap.biplot, pca.biplot, apca.biplot,
                                   nrow = 1),
                         blt.legend.biplot,
                         nrow = 1, rel_widths = c(3,0.5)) +
-  ggtitle('B') +
+  ggtitle('(b)') +
   theme(plot.title = element_text(hjust = 0, size = 20, face = 'bold'))
 
 
@@ -90,9 +88,10 @@ psap.vertex = plot_grid(
         aspect.ratio = 1)
 
 blt.ternary = plot_grid(psap.ternary  + annotate('text', x=0.0, y=1.3, hjust = 0, label = 'PSA-P', size = 6),
-                        NULL, psap.ternary.zoom, psap.vertex,
-                        nrow = 1, rel_widths = c(1,0.05,1,1)) +
-  ggtitle('A') +
+                        NULL, psap.ternary.zoom,
+                        psap.vertex + theme(plot.margin = margin(5,5,25,15)),
+                        nrow = 1, rel_widths = c(1,0.01,1,1)) +
+  ggtitle('(a)') +
   theme(plot.title = element_text(hjust = 0, size = 20, face = 'bold'))
 
 # ==== Figure 7 ====

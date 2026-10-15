@@ -1,5 +1,5 @@
 # ==== read data ====
-fp <- read.csv('feldspar/feldspar.csv')
+fp <- read.csv('feldspar/data/feldspar.csv')
 
 get_group <- function(x){
   k <- 39.102; na <- 22.9898; ca <- 40.08;
@@ -107,7 +107,7 @@ ggsave('feldspar/figures/feldspar_ternery.pdf', width = 12, height = 10)
 fp.pca = comp_pca(fp)
 pca.biplot = biplot_psa(fp.pca$scores[,1:2],
                         fp.pca$loadings[,1:2],
-                        label = rocktype) +
+                        label = mineral.group) +
   scale_color_manual(name = 'Mineral group', values = 1:8) +
   scale_shape_manual(name = 'Mineral group', values = 1:8) +
   ggtitle('PCA') +
@@ -117,7 +117,7 @@ pca.biplot = biplot_psa(fp.pca$scores[,1:2],
 fp.psap = flip_loading(fp.psap, c(1,2))
 psap.biplot = biplot_psa(fp.psap$scores[,1:2],
                          fp.psap$loadings[,1:2],
-                         label = rocktype) +
+                         label = mineral.group) +
   scale_color_manual(name = 'Mineral group', values = fp.color) +
   scale_shape_manual(name = 'Mineral group', values = fp.shape) +
   ggtitle('PSA-P')

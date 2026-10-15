@@ -63,5 +63,5 @@ g.psas = ex_plot_scores(ex1.psas$scores, ex1.df$label) + ggtitle('PSA-S')
 g.pca = ex_plot_scores(ex1.pca$scores, ex1.df$label) + ggtitle('PCA')
 g.apca = ex_plot_scores(ex1.apca$scores, ex1.df$label) + ggtitle('Log-ratio')
 
-g = plot_grid(g.data, g.psap, g.psas, NULL, g.pca, g.apca, nrow = 2)
-ggsave('ex1_scores.pdf', g, path = image.path, width = 9, height = 6)
+plot_grid(g.data, g.psap, g.psas, NULL, g.pca, g.apca, nrow = 2)
+ggsave('ex1_scores.pdf', path = image.path, width = 9, height = 6)

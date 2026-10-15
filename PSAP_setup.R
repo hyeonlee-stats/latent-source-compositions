@@ -30,4 +30,4 @@ library('psacomp')
 utils_files <- list.files('utils', pattern = '\\.R$', full.names = TRUE)
 invisible(lapply(utils_files, source))
 
-rm(pkg, required_packages, utils_files)
+rm(utils_files)
